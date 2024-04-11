@@ -1,0 +1,35 @@
+plugins {
+	id 'java'
+	id 'war'
+	id 'org.springframework.boot' version '3.2.4'
+	id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'com.dsci551'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	sourceCompatibility = '17'
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'mysql:mysql-connector-java:8.0.26'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+	implementation 'org.glassfish:jakarta.json:2.0.1'
+
+	runtimeOnly 'mysql:mysql-connector-java'
+	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	// Use the Spring Boot plugin to manage versions
+	implementation platform('org.springframework.boot:spring-boot-dependencies:2.5.2')
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
