@@ -6,7 +6,6 @@ import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonReader;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@WebServlet(name = "CrimeNearbyServlet", urlPatterns = "/crimes-nearby")
 public class CrimeNearbyServlet extends HttpServlet {
 
     @Override
@@ -31,14 +29,14 @@ public class CrimeNearbyServlet extends HttpServlet {
             1,
             "root");
         crimes.addAll(jdbcManager.fetchCrimesNearby(longitude, latitude, radius));
-        jdbcManager = new JdbcManager(
-            2,
-            "root");
-        crimes.addAll(jdbcManager.fetchCrimesNearby(longitude, latitude, radius));
-        jdbcManager = new JdbcManager(
-            3,
-            "root");
-        crimes.addAll(jdbcManager.fetchCrimesNearby(longitude, latitude, radius));
+//        jdbcManager = new JdbcManager(
+//            2,
+//            "root");
+//        crimes.addAll(jdbcManager.fetchCrimesNearby(longitude, latitude, radius));
+//        jdbcManager = new JdbcManager(
+//            3,
+//            "root");
+//        crimes.addAll(jdbcManager.fetchCrimesNearby(longitude, latitude, radius));
 
         JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
         for (Map<String, String> crime : crimes) {
@@ -71,14 +69,14 @@ public class CrimeNearbyServlet extends HttpServlet {
             1,
             "root");
         crimes.addAll(jdbcManager.fetchCrimesNearby(longitude, latitude, radius));
-        jdbcManager = new JdbcManager(
-            2,
-            "root");
-        crimes.addAll(jdbcManager.fetchCrimesNearby(longitude, latitude, radius));
-        jdbcManager = new JdbcManager(
-            3,
-            "root");
-        crimes.addAll(jdbcManager.fetchCrimesNearby(longitude, latitude, radius));
+//        jdbcManager = new JdbcManager(
+//            2,
+//            "root");
+//        crimes.addAll(jdbcManager.fetchCrimesNearby(longitude, latitude, radius));
+//        jdbcManager = new JdbcManager(
+//            3,
+//            "root");
+//        crimes.addAll(jdbcManager.fetchCrimesNearby(longitude, latitude, radius));
 
         // Build JSON response
         try {

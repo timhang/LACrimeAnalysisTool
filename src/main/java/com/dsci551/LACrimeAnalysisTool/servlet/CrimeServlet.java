@@ -1,29 +1,18 @@
 package com.dsci551.LACrimeAnalysisTool.servlet;
 
-import com.dsci551.LACrimeAnalysisTool.controller.CrimeDataRepository;
 import com.dsci551.LACrimeAnalysisTool.controller.JdbcManager;
 import com.dsci551.LACrimeAnalysisTool.model.CrimeData;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonReader;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 import java.io.IOException;
-@WebServlet(name = "CrimeServlet", urlPatterns = "/crime")
-public class CrimeServlet extends HttpServlet {
-    @Autowired
-    private CrimeDataRepository crimeDataRepository;
 
-    @Override
-    public void init() {
-        SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
-    }
+public class CrimeServlet extends HttpServlet {
     private JdbcManager jdbcManager = new JdbcManager(
         1,
         "root");
