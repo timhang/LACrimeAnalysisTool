@@ -69,14 +69,14 @@ public class CrimeNearbyServlet extends HttpServlet {
             1,
             "root");
         crimes.addAll(jdbcManager.fetchCrimesNearby(longitude, latitude, radius));
-//        jdbcManager = new JdbcManager(
-//            2,
-//            "root");
-//        crimes.addAll(jdbcManager.fetchCrimesNearby(longitude, latitude, radius));
-//        jdbcManager = new JdbcManager(
-//            3,
-//            "root");
-//        crimes.addAll(jdbcManager.fetchCrimesNearby(longitude, latitude, radius));
+        jdbcManager = new JdbcManager(
+            2,
+            "root");
+        crimes.addAll(jdbcManager.fetchCrimesNearby(longitude, latitude, radius));
+        jdbcManager = new JdbcManager(
+            3,
+            "root");
+        crimes.addAll(jdbcManager.fetchCrimesNearby(longitude, latitude, radius));
 
         // Build JSON response
         try {

@@ -32,18 +32,16 @@ public class JdbcManager {
     private String password3 = "crimedata3";
 
     public JdbcManager(int dbNumber, String user) {
-//        if (dbNumber == 3) {
-//            this.url = url3;
-//            this.password = password3;
-//        } else if (dbNumber == 2) {
-//            this.url = url2;
-//            this.password = password2;
-//        } else {
-//            this.url = url1;
-//            this.password = password1;
-//        }
-        this.url = url1;
-        this.password = password1;
+        if (dbNumber == 3) {
+            this.url = url3;
+            this.password = password3;
+        } else if (dbNumber == 2) {
+            this.url = url2;
+            this.password = password2;
+        } else {
+            this.url = url1;
+            this.password = password1;
+        }
     }
 
     public List<String> fetchCrimeData() {
@@ -102,6 +100,7 @@ public class JdbcManager {
                     crimeData.setCrossStreet(rs.getString("Cross_Street"));
                     crimeData.setLat(rs.getFloat("LAT"));
                     crimeData.setLon(rs.getFloat("LON"));
+                    crimeData.setViolenceLevel(determineViolenceLevel(rs.getString("Weapon_Desc"), rs.getString("Crm_Cd_Desc")));
                 }
             }
         } catch (Exception e) {
@@ -139,6 +138,29 @@ public class JdbcManager {
             // Consider a better error handling strategy
         }
         return crimes;
+    }
+
+    public int determineViolenceLevel(String weaponDesc, String crimeDesc) {
+        weaponDesc = weaponDesc.toUpperCase();
+        crimeDesc = crimeDesc.toUpperCase();
+
+        if (weaponDesc.contains("GUN") || weaponDesc.contains("RIFLE") || weaponDesc.contains("PISTOL") ||
+            weaponDesc.contains("SHOTGUN") || weaponDesc.contains("REVOLVER") || weaponDesc.contains("FIREARM") ||
+            crimeDesc.contains("HOMICIDE") || crimeDesc.contains("RAPE") || crimeDesc.contains("ROBBERY") ||
+            crimeDesc.contains("ASSAULT WITH DEADLY")) {
+            return 3;
+        } else if (crimeDesc.contains("ASSAULT") || crimeDesc.contains("KIDNAPPING") ||
+            weaponDesc.contains("KNIFE") || weaponDesc.contains("BLADE")) {
+            return 3;
+        } else if (weaponDesc.contains("KNIFE") || weaponDesc.contains("BLADE") || weaponDesc.contains("AXE") ||
+            weaponDesc.contains("MACHETE") || weaponDesc.contains("HAMMER") || weaponDesc.contains("SCREWDRIVER") ||
+            weaponDesc.contains("CLUB") || weaponDesc.contains("BAT") || weaponDesc.contains("CHAIN") ||
+            weaponDesc.contains("BLACKJACK") || weaponDesc.contains("BOTTLE") || crimeDesc.contains("BURGLARY") ||
+            crimeDesc.contains("THEFT") || crimeDesc.contains("VANDALISM") || crimeDesc.contains("FRAUD")) {
+            return 2;
+        } else {
+            return 1;
+        }
     }
 
     public List<CrimeData> fetchCrimes(String startDate, String endDate, String areaName, String crimeCode, Double latitude, Double longitude, Double radius) {
@@ -198,6 +220,65 @@ public class JdbcManager {
                 crime.setCrmCdDesc(rs.getString("Crm_Cd_Desc"));
                 crime.setLat(rs.getFloat("LAT"));
                 crime.setLon(rs.getFloat("LON"));
+                crime.setViolenceLevel(determineViolenceLevel(rs.getString("Weapon_Desc"), rs.getString("Crm_Cd_Desc")));
+                crimes.add(crime);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return crimes;
+    }
+
+    public List<CrimeData> fetchCrimesByArea(String startDate, String endDate, String areaName, String crimeCode) {
+        List<CrimeData> crimes = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("SELECT * FROM CrimeData WHERE ");
+
+        List<Object> params = new ArrayList<>();
+
+        // Date filter
+        if (startDate != null && endDate != null) {
+            sql.append("DATE_OCC BETWEEN ? AND ? AND ");
+            params.add(startDate);
+            params.add(endDate);
+        }
+
+        // Crime code filter
+        if (crimeCode != null && !crimeCode.isEmpty()) {
+            sql.append("Crm_Cd = ? AND ");
+            params.add(crimeCode);
+        }
+
+        // Area name filter
+        if (areaName != null && !areaName.isEmpty()) {
+            sql.append("AREA_NAME = ? ");
+            params.add(areaName);
+        }
+
+        // Remove the last "AND " if necessary
+        if (sql.toString().endsWith("AND ")) {
+            sql = new StringBuilder(sql.substring(0, sql.length() - 4));
+        }
+
+        // Execute the query
+        try (Connection conn = DriverManager.getConnection(url, user, password);
+             PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
+
+            for (int i = 0; i < params.size(); i++) {
+                pstmt.setObject(i + 1, params.get(i));
+            }
+
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                // Assuming you have a Crime class to store these
+                CrimeData crime = new CrimeData();
+                crime.setDrNo(rs.getString("DR_NO"));
+                crime.setDateOcc(rs.getDate("DATE_OCC"));
+                crime.setAreaName(rs.getString("AREA_NAME"));
+                crime.setCrmCd(rs.getString("Crm_Cd"));
+                crime.setCrmCdDesc(rs.getString("Crm_Cd_Desc"));
+                crime.setLat(rs.getFloat("LAT"));
+                crime.setLon(rs.getFloat("LON"));
+                crime.setViolenceLevel(determineViolenceLevel(rs.getString("Weapon_Desc"), rs.getString("Crm_Cd_Desc")));
                 crimes.add(crime);
             }
         } catch (SQLException e) {
@@ -207,9 +288,9 @@ public class JdbcManager {
     }
 
     // Method to get a list of all crime codes
-    public List<CrimeData> getAllCrimeCodes() {
-        List<CrimeData> codes = new ArrayList<>();
-        String sql = "SELECT Crm_Cd, Crm_Cd_Desc FROM CrimeCodes";
+    public Map<String, String> getAllCrimeCodes() {
+        Map<String, String> codes = new HashMap<>();
+        String sql = "SELECT DISTINCT Crm_Cd, Crm_Cd_Desc FROM CrimeData WHERE Crm_Cd IS NOT NULL AND Crm_Cd_Desc IS NOT NULL ORDER BY Crm_cd";
 
         // Using try-with-resources to ensure that all resources are closed properly
         try (Connection conn = DriverManager.getConnection(url, user, password);
@@ -219,10 +300,10 @@ public class JdbcManager {
             while (rs.next()) {
                 String code = rs.getString("Crm_Cd");
                 String description = rs.getString("Crm_Cd_Desc");
-                CrimeData newCrimeCode = new CrimeData();
-                newCrimeCode.setCrmCd(code);
-                newCrimeCode.setCrmCdDesc(description);
-                codes.add(newCrimeCode);
+                // CrimeData newCrimeCode = new CrimeData();
+                // newCrimeCode.setCrmCd(code);
+                // newCrimeCode.setCrmCdDesc(description);
+                codes.put(code, description);
             }
         } catch (SQLException e) {
             e.printStackTrace(); // Handle exceptions or throw them as needed

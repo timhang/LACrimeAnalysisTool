@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CrimeSearchServlet extends HttpServlet {
@@ -29,14 +30,31 @@ public class CrimeSearchServlet extends HttpServlet {
         String endDate = jsonObject.getString("endDate", null);
         String areaName = jsonObject.getString("areaName", null);
         String crimeCode = jsonObject.getString("crimeCode", null);
-        Double latitude = jsonObject.isNull("latitude") ? null : jsonObject.getJsonNumber("latitude").doubleValue();
-        Double longitude = jsonObject.isNull("longitude") ? null : jsonObject.getJsonNumber("longitude").doubleValue();
-        Double radius = jsonObject.isNull("radius") ? null : jsonObject.getJsonNumber("radius").doubleValue();
 
+
+
+        String filterBy = jsonObject.getString("filterBy", null);
         // Query the database
-        JdbcManager jdbcManager = new JdbcManager(1, "root");
-        List<CrimeData> crimes = jdbcManager.fetchCrimes(startDate, endDate, areaName, crimeCode, latitude, longitude, radius);
+        List<CrimeData> crimes = new ArrayList<>();
 
+        if ("area".equals(filterBy)) {
+            JdbcManager jdbcManager = new JdbcManager(1, "root");
+            crimes.addAll(jdbcManager.fetchCrimesByArea(startDate, endDate, areaName, crimeCode));
+            jdbcManager = new JdbcManager(2, "root");
+            crimes.addAll(jdbcManager.fetchCrimesByArea(startDate, endDate, areaName, crimeCode));
+            jdbcManager = new JdbcManager(3, "root");
+            crimes.addAll(jdbcManager.fetchCrimesByArea(startDate, endDate, areaName, crimeCode));
+        } else {
+            Double latitude = jsonObject.isNull("latitude") ? null : jsonObject.getJsonNumber("latitude").doubleValue();
+            Double longitude = jsonObject.isNull("longitude") ? null : jsonObject.getJsonNumber("longitude").doubleValue();
+            Double radius = jsonObject.isNull("radius") ? null : jsonObject.getJsonNumber("radius").doubleValue();
+            JdbcManager jdbcManager = new JdbcManager(1, "root");
+            crimes.addAll(jdbcManager.fetchCrimes(startDate, endDate, areaName, crimeCode, latitude, longitude, radius));
+            jdbcManager = new JdbcManager(2, "root");
+            crimes.addAll(jdbcManager.fetchCrimes(startDate, endDate, areaName, crimeCode, latitude, longitude, radius));
+            jdbcManager = new JdbcManager(3, "root");
+            crimes.addAll(jdbcManager.fetchCrimes(startDate, endDate, areaName, crimeCode, latitude, longitude, radius));
+        }
         // Build JSON response
         JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
         for (CrimeData crime : crimes) {
@@ -48,7 +66,7 @@ public class CrimeSearchServlet extends HttpServlet {
                 .add("crimeDescription", crime.getCrmCdDesc())
                 .add("latitude", crime.getLat())
                 .add("longitude", crime.getLon())
-                .add("violenceLevel", 2));
+                .add("violenceLevel", crime.getViolenceLevel()));
         }
 
         // Send response

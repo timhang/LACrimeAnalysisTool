@@ -245,7 +245,15 @@ public class CrimeData {
     private Float lat;
     private Float lon;
 
+    public Integer getViolenceLevel() {
+        return violenceLevel;
+    }
 
+    public void setViolenceLevel(int violenceLevel) {
+        this.violenceLevel = violenceLevel;
+    }
+
+    private Integer violenceLevel;
 
     // Getters and setters
     // Note: For the Date fields, you might consider using @Temporal annotations to specify the DATE or TIMESTAMP type

@@ -13,9 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class CrimeServlet extends HttpServlet {
-    private JdbcManager jdbcManager = new JdbcManager(
-        1,
-        "root");
+
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -32,7 +30,10 @@ public class CrimeServlet extends HttpServlet {
         }
 
         // Initialize JdbcManager with your database connection details
-
+        int dbIndex = Integer.parseInt(drNo) % 3;
+        JdbcManager jdbcManager = new JdbcManager(
+            dbIndex + 1,
+            "root");
         CrimeData crimeData = jdbcManager.fetchCrimeDataByDrNo(drNo);
 
         // Output the crime data
@@ -62,6 +63,7 @@ public class CrimeServlet extends HttpServlet {
             out.println("<p>Cross Street: " + crimeData.getCrossStreet() + "</p>");
             out.println("<p>Latitude: " + crimeData.getLat() + "</p>");
             out.println("<p>Longitude: " + crimeData.getLon() + "</p>");
+            out.println("<p>Violence Level: " + crimeData.getViolenceLevel() + "</p>");
             out.println("</body></html>");
         } else {
             out.println("<html><body><h2>No data found for DR_NO: " + drNo + "</h2></body></html>");
@@ -78,8 +80,8 @@ public class CrimeServlet extends HttpServlet {
         try (JsonReader reader = Json.createReader(req.getInputStream())) {
             JsonObject jsonInput = reader.readObject();
             String drNo = jsonInput.getString("drNo");
-            int dbIndex = Math.abs(drNo.hashCode()) % 3;
-            jdbcManager = new JdbcManager(
+            int dbIndex = Integer.parseInt(drNo) % 3;
+            JdbcManager jdbcManager = new JdbcManager(
                 dbIndex + 1,
                 "root");
             CrimeData crimeData = jdbcManager.fetchCrimeDataByDrNo(drNo);
@@ -109,6 +111,7 @@ public class CrimeServlet extends HttpServlet {
                     .add("crossStreet", crimeData.getCrossStreet() != null ? crimeData.getCrossStreet() : "")
                     .add("lat", crimeData.getLat() == null ? "" : crimeData.getLat().toString())
                     .add("lon", crimeData.getLon() == null ? "" : crimeData.getLon().toString())
+                    .add("violenceLevel", crimeData.getViolenceLevel() == null ? "" : Integer.toString(crimeData.getViolenceLevel()))
                     .build();
 
                 resp.getWriter().write(jsonResponse.toString());
