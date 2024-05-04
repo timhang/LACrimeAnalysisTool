@@ -5,9 +5,9 @@ import csv
 # Database setup function
 def setup_database():
     db_config = {
-        'db1': {'host': 'crimedata1.czk6okwo4kzv.us-west-1.rds.amazonaws.com', 'port': 3306, 'database': 'CrimeData', 'user': 'root', 'password': 'crimedata1'},
-        'db2': {'host': 'crimedata2.czk6okwo4kzv.us-west-1.rds.amazonaws.com', 'port': 3306, 'database': 'CrimeData', 'user': 'root', 'password': 'crimedata2'},
-        'db3': {'host': 'crimedata3.czk6okwo4kzv.us-west-1.rds.amazonaws.com', 'port': 3306, 'database': 'CrimeData', 'user': 'root', 'password': 'crimedata3'}
+        'db1': {'host': '{url}', 'port': 3306, 'database': 'CrimeData', 'user': 'root', 'password': 'crimedata1'},
+        'db2': {'host': '{url}', 'port': 3306, 'database': 'CrimeData', 'user': 'root', 'password': 'crimedata2'},
+        'db3': {'host': '{url}', 'port': 3306, 'database': 'CrimeData', 'user': 'root', 'password': 'crimedata3'}
     }
     # conn = sqlite3.connect('crime_data.db')
     # conn = mysql.connector.connect(**db_config.get('db1'))
