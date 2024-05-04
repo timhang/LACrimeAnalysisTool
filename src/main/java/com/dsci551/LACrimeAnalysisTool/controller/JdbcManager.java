@@ -17,11 +17,11 @@ public class JdbcManager {
 
     private String url;
 
-    private String url1 = "jdbc:mysql://crimedata1.czk6okwo4kzv.us-west-1.rds.amazonaws.com:3306/CrimeData?useSSL=false&serverTimezone=UTC";
+    private String url1 = "jdbc:mysql://{url}:3306/CrimeData?useSSL=false&serverTimezone=UTC";
 
-    private String url2 = "jdbc:mysql://crimedata2.czk6okwo4kzv.us-west-1.rds.amazonaws.com:3306/CrimeData?useSSL=false&serverTimezone=UTC";
+    private String url2 = "jdbc:mysql://{url}:3306/CrimeData?useSSL=false&serverTimezone=UTC";
 
-    private String url3 = "jdbc:mysql://crimedata3.czk6okwo4kzv.us-west-1.rds.amazonaws.com:3306/CrimeData?useSSL=false&serverTimezone=UTC";
+    private String url3 = "jdbc:mysql://{url}:3306/CrimeData?useSSL=false&serverTimezone=UTC";
 
     private String user = "root";
     private String password;
